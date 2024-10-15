@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previsão do Tempo Agora</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Previsão do Tempo Agora</h1>
+        <form id="weather-form">
+            <input type="text" id="city-input" placeholder="Digite o nome da cidade" required>
+            <button type="submit" id="get-weather">Obter Previsão</button>
+        </form>
+        <div id="main-weather">
+            <h2 id="main-location"></h2>
+            <p id="main-temperature"></p>
+            <p id="main-description"></p>
+            <p id="main-humidity"></p>
+            <p id="main-wind"></p>
+        </div>
+        <div id="weekly-forecast">
+            <div class="day-card" id="domingo-forecast" onclick="abrirPopup('domingo')">
+                <p>Domingo</p>
+                <div class="weather-icon" id="domingo-icon"></div>
+                <p id="domingo-temperature"></p>
+            </div>
+            <div class="day-card" id="segunda-feira-forecast" onclick="abrirPopup('segunda-feira')">
+                <p>Segunda-feira</p>
+                <div class="weather-icon" id="segunda-feira-icon"></div>
+                <p id="segunda-feira-temperature"></p>
+            </div>
+            <div class="day-card" id="terça-feira-forecast" onclick="abrirPopup('terça-feira')">
+                <p>Terça-feira</p>
+                <div class="weather-icon" id="terça-feira-icon"></div>
+                <p id="terça-feira-temperature"></p>
+            </div>
+            <div class="day-card" id="quarta-feira-forecast" onclick="abrirPopup('quarta-feira')">
+                <p>Quarta-feira</p>
+                <div class="weather-icon" id="quarta-feira-icon"></div>
+                <p id="quarta-feira-temperature"></p>
+            </div>
+            <div class="day-card" id="quinta-feira-forecast" onclick="abrirPopup('quinta-feira')">
+                <p>Quinta-feira</p>
+                <div class="weather-icon" id="quinta-feira-icon"></div>
+                <p id="quinta-feira-temperature"></p>
+            </div>
+            <div class="day-card" id="sexta-feira-forecast" onclick="abrirPopup('sexta-feira')">
+                <p>Sexta-feira</p>
+                <div class="weather-icon" id="sexta-feira-icon"></div>
+                <p id="sexta-feira-temperature"></p>
+            </div>
+            <div class="day-card" id="sábado-forecast" onclick="abrirPopup('sábado')">
+                <p>Sábado</p>
+                <div class="weather-icon" id="sábado-icon"></div>
+                <p id="sábado-temperature"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="fecharPopup()">&times;</span>
+            <h3 id="popup-day"></h3>
+            <p id="popup-date"></p>
+            <p id="popup-description"></p>
+            <p id="popup-temp"></p>
+            <p id="popup-min-temp"></p>
+            <p id="popup-max-temp"></p>
+            <p id="popup-humidity"></p>
+            <p id="popup-wind"></p>
+            <p id="popup-sunrise"></p>
+            <p id="popup-sunset"></p>
+        </div>
+    </div>
+
+    <script src="./scripts.js"></script>
+</body>
+</html>
