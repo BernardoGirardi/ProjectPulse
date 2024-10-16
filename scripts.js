@@ -20,10 +20,6 @@ async function obterDadosPrevisao(cidade) {
         if (!resposta.ok) throw new Error(`HTTP error! status: ${resposta.status}`);
         const dados = await resposta.json();
         registrarLog(`Obter Previsão para ${cidade}`, 'Sucesso');
-        
-        // Exibindo os dados no console
-        console.log("Dados de previsão recebidos:", dados);
-        
         return dados;
     } catch (erro) {
         registrarLog(`Obter Previsão para ${cidade}`, 'Falha');
@@ -39,10 +35,6 @@ async function obterCondicoesAtuais(cidade) {
         if (!resposta.ok) throw new Error(`HTTP error! status: ${resposta.status}`);
         const dados = await resposta.json();
         registrarLog(`Obter Condições Atuais para ${cidade}`, 'Sucesso');
-
-        // Exibindo os dados no console
-        console.log("Dados de condições atuais recebidos:", dados);
-
         return dados;
     } catch (erro) {
         registrarLog(`Obter Condições Atuais para ${cidade}`, 'Falha');
@@ -58,10 +50,6 @@ async function obterHistoricoMeteorologico(cidade, data) {
         if (!resposta.ok) throw new Error(`HTTP error! status: ${resposta.status}`);
         const dados = await resposta.json();
         registrarLog(`Obter Histórico para ${cidade} em ${data}`, 'Sucesso');
-
-        // Exibindo os dados no console
-        console.log("Dados de histórico recebidos:", dados);
-
         return dados;
     } catch (erro) {
         registrarLog(`Obter Histórico para ${cidade} em ${data}`, 'Falha');
@@ -187,8 +175,17 @@ window.addEventListener('load', () => {
     exibirLogs(); // Exibe os logs ao carregar a página
 });
 
-// Função para limpar todos os logs
-document.getElementById('clear-logs-button').addEventListener('click', () => {
-    localStorage.removeItem('logs');
-    exibirLogs(); // Atualiza a exibição dos logs
-});
+// Função para abrir o popup de logs
+function abrirPopupLogs() {
+    const popupLogs = document.getElementById('popup-logs');
+    exibirLogs(); // Carrega os logs no popup ao abrir
+    popupLogs.classList.add('show');
+    document.body.classList.add('popup-open');
+}
+
+// Função para fechar o popup de logs
+function fecharPopupLogs() {
+    const popupLogs = document.getElementById('popup-logs');
+    popupLogs.classList.remove('show');
+    document.body.classList.remove('popup-open');
+}
