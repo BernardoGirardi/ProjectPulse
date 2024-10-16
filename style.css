@@ -195,3 +195,16 @@ li:hover .delete-log-button {
     margin-top: 20px; /* Espaçamento em relação aos outros elementos */
 }
 
+.delete-log-button {
+    display: none; /* Ocultar inicialmente */
+    margin-left: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#log-list li:hover .delete-log-button {
+    display: inline-block; /* Mostrar no hover */
+}
+
