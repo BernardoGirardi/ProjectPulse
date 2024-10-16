@@ -146,3 +146,52 @@ button:hover {
 body.popup-open {
     overflow: hidden;
 }
+
+.popup-button {
+    padding: 10px;
+    border: 2px solid #39FF14;
+    border-radius: 20px;
+    background-color: transparent;
+    color: white;
+    cursor: pointer;
+    margin-top: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.popup-button:hover {
+    background-color: #39FF14;
+    color: black;
+}
+
+#popup-logs .popup-content {
+    max-width: 500px; /* Ajuste conforme necessário */
+}
+
+#log-list {
+    max-height: 300px; /* Limitar altura da lista */
+    overflow-y: auto; /* Permitir rolagem */
+}
+
+.delete-log-button {
+    display: none; /* Inicialmente escondido */
+    margin-left: 10px;
+    border: none;
+    background-color: #FF6347; /* Cor de fundo do botão de excluir */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Mostrar o botão de excluir quando o log é exibido */
+li:hover .delete-log-button {
+    display: inline-block; /* Exibir ao passar o mouse */
+}
+
+/* Ajuste para o botão de exibir logs */
+.popup-button {
+    margin-top: 20px; /* Espaçamento em relação aos outros elementos */
+}
+

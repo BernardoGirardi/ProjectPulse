@@ -1,25 +1,15 @@
 const API_KEY = 'b19bd1ae1c834309b7904758241110';
-const LOG_API_URL = 'https://sua-api-de-logs.com/logs'; // Substitua pela URL real da sua API de logs
 
-// Função para registrar logs
-async function registrarLog(operacao, status) {
+// Função para registrar logs localmente
+function registrarLog(operacao, status) {
     const logData = {
         operacao,
         status,
         timestamp: new Date().toISOString(),
     };
-    try {
-        const resposta = await fetch(LOG_API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(logData),
-        });
-        return await resposta.json();
-    } catch (erro) {
-        console.error('Erro ao registrar log:', erro);
-    }
+    let logs = JSON.parse(localStorage.getItem('logs')) || [];
+    logs.push(logData);
+    localStorage.setItem('logs', JSON.stringify(logs));
 }
 
 // Função para obter dados de previsão de 7 dias
@@ -27,12 +17,13 @@ async function obterDadosPrevisao(cidade) {
     const url = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${cidade}&days=7&lang=pt`;
     try {
         const resposta = await fetch(url);
+        if (!resposta.ok) throw new Error(`HTTP error! status: ${resposta.status}`);
         const dados = await resposta.json();
-        await registrarLog(`Obter Previsão para ${cidade}`, 'Sucesso');
+        registrarLog(`Obter Previsão para ${cidade}`, 'Sucesso');
         return dados;
     } catch (erro) {
-        await registrarLog(`Obter Previsão para ${cidade}`, 'Falha');
-        console.error('Erro ao obter dados de previsão:', erro);
+        registrarLog(`Obter Previsão para ${cidade}`, 'Falha');
+        console.error('Erro ao obter dados de previsão:', erro.message);
     }
 }
 
@@ -41,12 +32,13 @@ async function obterCondicoesAtuais(cidade) {
     const url = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${cidade}&lang=pt`;
     try {
         const resposta = await fetch(url);
+        if (!resposta.ok) throw new Error(`HTTP error! status: ${resposta.status}`);
         const dados = await resposta.json();
-        await registrarLog(`Obter Condições Atuais para ${cidade}`, 'Sucesso');
+        registrarLog(`Obter Condições Atuais para ${cidade}`, 'Sucesso');
         return dados;
     } catch (erro) {
-        await registrarLog(`Obter Condições Atuais para ${cidade}`, 'Falha');
-        console.error('Erro ao obter condições atuais:', erro);
+        registrarLog(`Obter Condições Atuais para ${cidade}`, 'Falha');
+        console.error('Erro ao obter condições atuais:', erro.message);
     }
 }
 
@@ -55,35 +47,37 @@ async function obterHistoricoMeteorologico(cidade, data) {
     const url = `https://api.weatherapi.com/v1/history.json?key=${API_KEY}&q=${cidade}&dt=${data}&lang=pt`;
     try {
         const resposta = await fetch(url);
+        if (!resposta.ok) throw new Error(`HTTP error! status: ${resposta.status}`);
         const dados = await resposta.json();
-        await registrarLog(`Obter Histórico para ${cidade} em ${data}`, 'Sucesso');
+        registrarLog(`Obter Histórico para ${cidade} em ${data}`, 'Sucesso');
         return dados;
     } catch (erro) {
-        await registrarLog(`Obter Histórico para ${cidade} em ${data}`, 'Falha');
-        console.error('Erro ao obter histórico meteorológico:', erro);
+        registrarLog(`Obter Histórico para ${cidade} em ${data}`, 'Falha');
+        console.error('Erro ao obter histórico meteorológico:', erro.message);
     }
 }
 
 // Função para exibir dados de previsão
 async function exibirClima(cidade) {
+    console.log('Cidade:', cidade); // Verifique se a cidade está correta
     const dadosPrevisao = await obterDadosPrevisao(cidade);
     if (!dadosPrevisao) return;
 
+    // Atualizar informações na interface
     document.getElementById('main-location').textContent = `Localização Atual: ${dadosPrevisao.location.name}, ${dadosPrevisao.location.country}`;
     document.getElementById('main-temperature').textContent = `Temperatura: ${dadosPrevisao.current.temp_c} °C`;
     document.getElementById('main-description').textContent = `Descrição: ${dadosPrevisao.current.condition.text}`;
     document.getElementById('main-humidity').textContent = `Umidade: ${dadosPrevisao.current.humidity}%`;
     document.getElementById('main-wind').textContent = `Vento: ${dadosPrevisao.current.wind_kph} km/h`;
 
+    // Dias da semana
     const dias = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado'];
-    dadosPrevisao.forecast.forecastday.forEach((dia, index) => {
+    dadosPrevisao.forecast.forecastday.forEach((dia) => {
         const data = new Date(dia.date);
         const nomeDia = dias[data.getDay()];
-
         const urlIcone = `https:${dia.day.condition.icon}`;
         document.getElementById(`${nomeDia}-icon`).style.backgroundImage = `url(${urlIcone})`;
         document.getElementById(`${nomeDia}-temperature`).textContent = `${dia.day.avgtemp_c} °C`;
-
         document.getElementById(`${nomeDia}-forecast`).dataset.details = JSON.stringify({
             date: dia.date,
             description: dia.day.condition.text,
@@ -110,13 +104,12 @@ function abrirPopup(dia) {
     document.getElementById('popup-date').textContent = `Data: ${detalhes.date}`;
     document.getElementById('popup-description').textContent = `Descrição: ${detalhes.description}`;
     document.getElementById('popup-temp').textContent = `Temperatura: ${detalhes.temp}`;
-    document.getElementById('popup-min-temp').textContent = `Temp. Mínima: ${detalhes.temp_min}`;
-    document.getElementById('popup-max-temp').textContent = `Temp. Máxima: ${detalhes.temp_max}`;
+    document.getElementById('popup-min-temp').textContent = `Temp. Mínima: ${detalhes.minTemp}`;
+    document.getElementById('popup-max-temp').textContent = `Temp. Máxima: ${detalhes.maxTemp}`;
     document.getElementById('popup-humidity').textContent = `Umidade: ${detalhes.humidity}`;
     document.getElementById('popup-wind').textContent = `Vento: ${detalhes.wind}`;
     document.getElementById('popup-sunrise').textContent = `Nascer do Sol: ${detalhes.sunrise}`;
     document.getElementById('popup-sunset').textContent = `Pôr do Sol: ${detalhes.sunset}`;
-    
     document.getElementById('popup').classList.add('show');
     document.body.classList.add('popup-open');
 }
@@ -153,41 +146,47 @@ window.addEventListener('load', () => {
 // Funções para gerenciar logs
 
 // Função para exibir os logs
-async function exibirLogs() {
-    try {
-        const resposta = await fetch(LOG_API_URL);
-        const logs = await resposta.json();
-        const logList = document.getElementById('log-list');
-        logList.innerHTML = ''; // Limpa a lista antes de exibir
-
-        logs.forEach(log => {
-            const logItem = document.createElement('li');
-            logItem.textContent = `${log.operacao} - ${log.status} - ${log.timestamp}`;
-
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Excluir';
-            deleteButton.classList.add('delete-log-button');
-            deleteButton.addEventListener('click', () => excluirLog(log.id));
-
-            logItem.appendChild(deleteButton);
-            logList.appendChild(logItem);
-        });
-    } catch (erro) {
-        console.error('Erro ao obter logs:', erro);
-    }
+function exibirLogs() {
+    const logs = JSON.parse(localStorage.getItem('logs')) || [];
+    const logList = document.getElementById('log-list');
+    logList.innerHTML = ''; // Limpa a lista antes de exibir
+    logs.forEach(log => {
+        const logItem = document.createElement('li');
+        logItem.textContent = `${log.operacao} - ${log.status} - ${log.timestamp}`;
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Excluir';
+        deleteButton.classList.add('delete-log-button');
+        deleteButton.addEventListener('click', () => excluirLog(logItem, log));
+        logItem.appendChild(deleteButton);
+        logList.appendChild(logItem);
+    });
 }
 
 // Função para excluir um log
-async function excluirLog(id) {
-    try {
-        await fetch(`${LOG_API_URL}/${id}`, {
-            method: 'DELETE',
-        });
-        exibirLogs(); // Atualiza a lista após a exclusão
-    } catch (erro) {
-        console.error('Erro ao excluir log:', erro);
-    }
+function excluirLog(logItem, log) {
+    let logs = JSON.parse(localStorage.getItem('logs')) || [];
+    logs = logs.filter(l => l.timestamp !== log.timestamp); // Remove o log que está sendo excluído
+    localStorage.setItem('logs', JSON.stringify(logs));
+    logItem.remove(); // Remove o item da lista visual
 }
 
-// Evento para exibir logs
-document.getElementById('show-logs').addEventListener('click', exibirLogs);
+// Inicializa a exibição dos logs ao carregar a página
+window.addEventListener('load', () => {
+    exibirLogs(); // Exibe os logs ao carregar a página
+});
+
+// Função para abrir o popup de logs
+function abrirPopupLogs() {
+    const popupLogs = document.getElementById('popup-logs');
+    exibirLogs(); // Carrega os logs no popup ao abrir
+    popupLogs.classList.add('show');
+    document.body.classList.add('popup-open');
+}
+
+// Função para fechar o popup de logs
+function fecharPopupLogs() {
+    const popupLogs = document.getElementById('popup-logs');
+    popupLogs.classList.remove('show');
+    document.body.classList.remove('popup-open');
+}
+
